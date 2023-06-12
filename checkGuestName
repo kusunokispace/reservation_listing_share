@@ -1,0 +1,45 @@
+//一括処理の場合
+// 指定したゲスト名が予約一覧に存在するかをチェックする関数
+function checkGuestName_batch() {
+  // 予約一覧シートを取得
+  let sheet = SpreadsheetApp.getActive().getSheetByName('予約一覧');
+
+  // シートの最終行を取得
+  let lastRow = sheet.getLastRow();
+
+  // F列の値を取得
+  let fValues = sheet.getRange('F2:F' + lastRow).getValues();
+
+  // ゲスト名を一次元の配列に変換
+  var guestNames = fValues.flat();
+
+  // ゲスト名ごとに"新規"または空文字を返す配列を作成
+  var inputs = guestNames.map(function(guestName, index) {
+    return [(index === guestNames.indexOf(guestName)) ? "新規" : ""];
+  });
+
+  // G列に結果を設定
+  var inputsRange = sheet.getRange('G2:G' + lastRow);
+  inputsRange.setValues(inputs);
+}
+
+
+//予約情報を1列ずつ出力する場合。
+// 指定したゲスト名が予約一覧に存在するかをチェックする関数
+// fValues: 予約一覧のゲスト名配列
+// guestName: チェックするゲスト名
+function checkGuestName_individual(fValues, guestName) {
+  // ゲスト名配列を一意のセットに変換
+  var guestNameSet = new Set(fValues.flat());
+
+  // ゲスト名セットに指定したゲスト名が存在するかをチェック
+  var existingGuest = guestNameSet.has(guestName);
+
+  // ゲスト名が存在しない場合は、ゲスト名配列に追加
+  if (!existingGuest) {
+    fValues.push(guestName);
+  }
+
+  // ゲスト名が存在するかに応じて結果を返す
+  return existingGuest ? "" : "新規";
+}
